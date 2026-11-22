@@ -46,3 +46,17 @@ def test_excluir_tarefa(client):
 
 def test_buscar_inexistente(client):
     assert client.get("/api/tarefas/999").status_code == 404
+
+
+def test_criar_com_prioridade_e_ordenacao(client):
+    client.post("/api/tarefas", json={"titulo": "Baixa", "prioridade": "Baixa"})
+    client.post("/api/tarefas", json={"titulo": "Alta", "prioridade": "Alta"})
+    lista = client.get("/api/tarefas").get_json()
+    assert lista[0]["titulo"] == "Alta"
+
+
+def test_prioridade_invalida(client):
+    resposta = client.post(
+        "/api/tarefas", json={"titulo": "X", "prioridade": "Urgentíssima"}
+    )
+    assert resposta.status_code == 400

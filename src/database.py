@@ -31,7 +31,7 @@ def iniciar_banco(caminho):
 
 # ---------- CRUD ----------
 
-def criar_tarefa(caminho, titulo, descricao="", status="A Fazer",prioridade="Média"):
+def criar_tarefa(caminho, titulo, descricao="", status="A Fazer", prioridade="Média"):
     _, novo_id, _ = _executar(
         caminho,
         "INSERT INTO tarefas (titulo, descricao, status, prioridade) "

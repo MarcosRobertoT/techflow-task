@@ -22,6 +22,7 @@ def validar_status(status):
         )
     return status
 
+
 PRIORIDADES_VALIDAS = ("Alta", "Média", "Baixa")
 
 
