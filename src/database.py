@@ -23,24 +23,30 @@ def iniciar_banco(caminho):
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             titulo TEXT NOT NULL,
             descricao TEXT DEFAULT '',
-            status TEXT NOT NULL DEFAULT 'A Fazer'
+            status TEXT NOT NULL DEFAULT 'A Fazer',
+            prioridade TEXT NOT NULL DEFAULT 'Média'
         )
     """)
 
 
 # ---------- CRUD ----------
 
-def criar_tarefa(caminho, titulo, descricao="", status="A Fazer"):
+def criar_tarefa(caminho, titulo, descricao="", status="A Fazer",prioridade="Média"):
     _, novo_id, _ = _executar(
         caminho,
-        "INSERT INTO tarefas (titulo, descricao, status) VALUES (?, ?, ?)",
-        (titulo, descricao, status),
+        "INSERT INTO tarefas (titulo, descricao, status, prioridade) "
+        "VALUES (?, ?, ?, ?)",
+        (titulo, descricao, status, prioridade),
     )
     return buscar_tarefa(caminho, novo_id)
 
 
 def listar_tarefas(caminho):
-    return _executar(caminho, "SELECT * FROM tarefas ORDER BY id")[0]
+    return _executar(caminho, """
+        SELECT * FROM tarefas
+        ORDER BY CASE prioridade
+        WHEN 'Alta' THEN 1 WHEN 'Média' THEN 2 ELSE 3 END, id
+    """)[0]
 
 
 def buscar_tarefa(caminho, tarefa_id):
@@ -53,7 +59,7 @@ def buscar_tarefa(caminho, tarefa_id):
 def atualizar_tarefa(caminho, tarefa_id, **campos):
     permitidos = {
         k: v for k, v in campos.items()
-        if k in ("titulo", "descricao", "status")
+        if k in ("titulo", "descricao", "status", "prioridade")
     }
     if permitidos:
         sets = ", ".join(f"{k} = ?" for k in permitidos)

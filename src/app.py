@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, render_template, request
 
 import database as db
-from validacao import validar_status, validar_titulo
+from validacao import validar_status, validar_titulo, validar_prioridade
 
 
 def create_app(db_path="tasks.db"):
@@ -31,12 +31,13 @@ def create_app(db_path="tasks.db"):
     def criar():
         dados = request.get_json(silent=True) or {}
         try:
+            prioridade = validar_prioridade(dados.get("prioridade", "Média"))
             titulo = validar_titulo(dados.get("titulo"))
             status = validar_status(dados.get("status", "A Fazer"))
         except ValueError as erro:
             return jsonify({"erro": str(erro)}), 400
         tarefa = db.criar_tarefa(
-            caminho(), titulo, str(dados.get("descricao", "")), status
+            caminho(), titulo, str(dados.get("descricao", "")), status, prioridade=prioridade
         )
         return jsonify(tarefa), 201
 
@@ -53,6 +54,8 @@ def create_app(db_path="tasks.db"):
                 campos["status"] = validar_status(dados["status"])
             if "descricao" in dados:
                 campos["descricao"] = str(dados["descricao"])
+            if "prioridade" in dados:
+                campos["prioridade"] = validar_prioridade(dados["prioridade"])
         except ValueError as erro:
             return jsonify({"erro": str(erro)}), 400
         return jsonify(db.atualizar_tarefa(caminho(), tarefa_id, **campos))

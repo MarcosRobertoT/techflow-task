@@ -17,6 +17,7 @@
   <h1>TechFlow Tasks</h1>
 
   <form id="form">
+    <select id="prioridade"><option>Alta</option><option selected>Média</option><option>Baixa</option></select>
     <input id="titulo" placeholder="Título" required>
     <input id="descricao" placeholder="Descrição">
     <button type="submit">Adicionar</button>
@@ -47,7 +48,8 @@
           titulo.textContent = t.titulo;       // textContent evita XSS
           const desc = document.createElement("p");
           desc.textContent = t.descricao;
-          card.append(titulo, desc);
+          const prioridade = document.createElement("p")
+          card.append(titulo, desc, prioridade);
 
           STATUS.filter(outro => outro !== status).forEach(outro => {
             const b = document.createElement("button");
@@ -85,7 +87,8 @@
         method: "POST", headers: JSON_HEADERS,
         body: JSON.stringify({
           titulo: document.getElementById("titulo").value,
-          descricao: document.getElementById("descricao").value
+          descricao: document.getElementById("descricao").value,
+          prioridade: document.getElementById("prioridade").value
         })
       });
       e.target.reset();

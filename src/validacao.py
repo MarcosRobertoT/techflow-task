@@ -21,3 +21,14 @@ def validar_status(status):
             "Status inválido. Use: " + ", ".join(STATUS_VALIDOS) + "."
         )
     return status
+
+PRIORIDADES_VALIDAS = ("Alta", "Média", "Baixa")
+
+
+def validar_prioridade(prioridade):
+    """Retorna a prioridade se for válida ou lança ValueError."""
+    if prioridade not in PRIORIDADES_VALIDAS:
+        raise ValueError(
+            "Prioridade inválida. Use: " + ", ".join(PRIORIDADES_VALIDAS) + "."
+        )
+    return prioridade
