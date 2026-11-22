@@ -29,3 +29,13 @@ commits semânticos.
 
 ## Estrutura
 - `src/` código-fonte · `tests/` testes · `docs/` diagramas
+
+## Mudança de escopo (v1.1)
+**Data:** 10/11/2026
+**Mudança:** adição do campo *prioridade* (Alta, Média, Baixa) nas tarefas,
+com ordenação das mais críticas primeiro.
+**Justificativa:** após revisão com o cliente, percebeu-se que sem
+priorização a equipe não conseguia identificar rapidamente as tarefas
+críticas, objetivo central do projeto.
+**Impacto:** alteração na tabela `tarefas`, na validação, na API e na
+interface. Novo card criado no Kanban e testes adicionados.
