@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>TechFlow Tasks</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f4f5f7; }
+    form { display: flex; gap: 8px; margin-bottom: 20px; }
+    input { padding: 6px; }
+    .quadro { display: flex; gap: 16px; }
+    .coluna { flex: 1; background: #e2e4e9; padding: 10px; border-radius: 6px; }
+    .card { background: #fff; padding: 8px; margin: 8px 0; border-radius: 4px; }
+    button { margin: 4px 4px 0 0; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>TechFlow Tasks</h1>
+
+  <form id="form">
+    <input id="titulo" placeholder="Título" required>
+    <input id="descricao" placeholder="Descrição">
+    <button type="submit">Adicionar</button>
+  </form>
+
+  <div class="quadro" id="quadro"></div>
+
+  <script>
+    const STATUS = ["A Fazer", "Em Progresso", "Concluído"];
+    const JSON_HEADERS = { "Content-Type": "application/json" };
+
+    // Busca as tarefas na API e redesenha o quadro
+    async function carregar() {
+      const resposta = await fetch("/api/tarefas");
+      const tarefas = await resposta.json();
+      const quadro = document.getElementById("quadro");
+      quadro.innerHTML = "";
+
+      STATUS.forEach(status => {
+        const coluna = document.createElement("div");
+        coluna.className = "coluna";
+        coluna.innerHTML = "<h3>" + status + "</h3>";
+
+        tarefas.filter(t => t.status === status).forEach(t => {
+          const card = document.createElement("div");
+          card.className = "card";
+          const titulo = document.createElement("strong");
+          titulo.textContent = t.titulo;       // textContent evita XSS
+          const desc = document.createElement("p");
+          desc.textContent = t.descricao;
+          card.append(titulo, desc);
+
+          STATUS.filter(outro => outro !== status).forEach(outro => {
+            const b = document.createElement("button");
+            b.textContent = "→ " + outro;
+            b.onclick = () => mover(t.id, outro);
+            card.appendChild(b);
+          });
+
+          const excluirBtn = document.createElement("button");
+          excluirBtn.textContent = "Excluir";
+          excluirBtn.onclick = () => excluir(t.id);
+          card.appendChild(excluirBtn);
+
+          coluna.appendChild(card);
+        });
+        quadro.appendChild(coluna);
+      });
+    }
+
+    async function mover(id, status) {
+      await fetch("/api/tarefas/" + id, {
+        method: "PUT", headers: JSON_HEADERS, body: JSON.stringify({ status })
+      });
+      carregar();
+    }
+
+    async function excluir(id) {
+      await fetch("/api/tarefas/" + id, { method: "DELETE" });
+      carregar();
+    }
+
+    document.getElementById("form").onsubmit = async (e) => {
+      e.preventDefault();
+      await fetch("/api/tarefas", {
+        method: "POST", headers: JSON_HEADERS,
+        body: JSON.stringify({
+          titulo: document.getElementById("titulo").value,
+          descricao: document.getElementById("descricao").value
+        })
+      });
+      e.target.reset();
+      carregar();
+    };
+
+    carregar();
+  </script>
+</body>
+</html>
